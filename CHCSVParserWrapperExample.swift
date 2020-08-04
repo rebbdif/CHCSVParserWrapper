@@ -21,7 +21,7 @@ class ItemsFromCSVParser {
 		var message: String
 	}
 	
-	private var filesParser: LineByLineParser<Transaction>?
+	private var filesParser: LineByLineParser<Item>?
 	private lazy var filesManager = FileManager.default
 	
 	public func parse(fileAt url: URL?, completion:@escaping (ItemsParserError?)->()) {
@@ -43,11 +43,10 @@ class ItemsFromCSVParser {
 				return .success(nil)
 			}
 
-			let firstItem = fields.safeObject(at: 0)
+			let firstItem = try? fields.safeObject(at: 0)
 
 			// get fields
 			
-
 			let result = Item(firstItem: firstItem)
 			return .success(result)
 		}
@@ -58,12 +57,12 @@ class ItemsFromCSVParser {
 				if let value = value {
 					// handle value
 				} else {
-					let error = ItemParserError(title: "Error parsing file", message: "No transactions were imported")
+					let error = ItemsParserError(title: "Error parsing file", message: "No transactions were imported")
 					completion(error)
 				}
 				
 			case .failure(let error):
-				let error = ItemParserError(title: "Error parsing file", message: error.message)
+				let error = ItemsParserError(title: "Error parsing file", message: error.message)
 				completion(error)
 			}
 		})
